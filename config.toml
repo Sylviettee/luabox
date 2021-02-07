@@ -1,0 +1,4 @@
+[project]
+readme = "readme.md"
+template = "./templates/markdown.etlua"
+output = "./docs"

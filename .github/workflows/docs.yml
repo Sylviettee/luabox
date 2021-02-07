@@ -1,0 +1,45 @@
+name: Documentation
+
+on: push
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: install python dependencies
+        run:
+          pip install git+https://github.com/SovietKitsune/py-lua-doc
+          pip install mkdocs
+          pip install mkdocs-material
+
+      - uses: leafo/gh-actions-lua@v8.0.0
+        with:
+          luaVersion: "luajit-2.1.0-beta3"
+
+      - uses: leafo/gh-actions-luarocks@v4.0.0
+
+      - name: install lua dependencies
+        run: |
+          cd ./doc-gen/ && luarocks make docsdemo-dev-1.rockspec
+
+      - name: build docs
+        run: |
+          rm ./libs/types/discordia.lua
+          luadoc ./libs > docs.json
+          py-lua-doc
+          mkdocs build
+
+      - uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: gh-pages
+          build_dir: site
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

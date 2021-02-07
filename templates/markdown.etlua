@@ -1,0 +1,246 @@
+<%
+local names = {
+   modules = 'Module',
+   classes = 'Class',
+   structures = 'Structure'
+}
+
+local title = names[currentSection]
+
+local luaStd = {
+   ['nil'] = 'https://www.lua.org/pil/2.1.html',
+   ['boolean'] = 'https://www.lua.org/pil/2.2.html',
+   ['number'] = 'https://www.lua.org/pil/2.3.html',
+   ['string'] = 'https://www.lua.org/pil/2.4.html',
+   ['table'] = 'https://www.lua.org/pil/2.5.html',
+   ['function'] = 'https://www.lua.org/pil/2.6.html',
+   ['userdata'] = 'https://www.lua.org/pil/2.7.html',
+   ['thread'] = 'https://www.lua.org/pil/2.7.html',
+   ['any'] = 'https://www.lua.org/pil/contents.html#2'
+}
+
+local function getObj(name)
+   local location = locations[name]
+
+   local data = cleaned[location]
+
+   for i = 1, #data do
+      if data[i].name == name then
+         return data[i]
+      end
+   end
+end
+
+local function hasNil(rawType)
+   if rawType.id == 'nil' then
+      return true
+   elseif rawType.id == 'or' then
+      for i = 1, #rawType.types do
+         if hasNil(rawType.types[i]) then
+            return true
+         end
+      end
+   end
+
+   return false
+end
+
+local function locate(rawType, display)
+   if rawType.id == 'array' then
+      return locate(rawType.type) .. '[]'
+   elseif rawType.id == 'dict' then
+      return 'table<' .. locate(rawType.key_type) .. ', ' .. locate(rawType.value_type) .. '>'
+   elseif rawType.id == 'or' then
+      local res = ''
+
+      local has = hasNil(rawType)
+
+      for i = 1, #rawType.types do
+         if rawType.types[i].id ~= 'nil' then
+            res = res .. (res ~= '' and ' | ' or '') .. locate(rawType.types[i]) .. (has and '?' or '')
+         end
+      end
+
+      return res
+   elseif rawType.id == 'custom' then
+      if rawType.name == 'table' then
+         return '[' .. rawType.name .. '](' .. luaStd.table .. ')'
+      else
+         if locations[rawType.name] then
+            return '[' .. (display and display or rawType.name) .. '](../' .. locations[rawType.name] .. '/' .. rawType.name .. '.md)'
+         else
+            return display and display or rawType.name
+         end
+      end
+   elseif rawType.id == 'callable' then
+      local res = ''
+
+      for i = 1, #rawType.arg_types do
+         res = res .. (res ~= '' and ', ' or '') .. (rawType.arg_names[i] and rawType.arg_names[i] .. ': ' or '') .. locate(rawType.arg_types[i])
+      end
+
+      local returnType = ''
+
+      for k = 1, #rawType.return_types do
+         returnType = returnType .. (returnType ~= '' and ', ' or ': ') .. locate(rawType.return_types[k])
+      end
+
+      return 'fun(' .. res .. ')' .. returnType
+   else
+      return '[' .. (display and display or rawType.id) .. '](' .. luaStd[rawType.id] .. ')'
+   end
+end
+
+currentModule = getObj(currentModule.name)
+%>
+# <%= title %> `<%= currentModule.name %>`
+
+<%- currentModule.short_desc .. '\n' .. currentModule.desc  %>
+
+<%
+if currentSection == 'structures' then
+   %>
+## Declaration
+
+```lua
+<%= currentModule.name:find('%.') and '' or 'local ' %><%= currentModule.name %> = {
+   <% for i = 1, #currentModule.fields do
+      %><%- currentModule.fields[i].name %> = <%- parseType(currentModule.fields[i].type) .. (i ~= #currentModule.fields and ',\n   ' or '') %><%end%>
+}
+```
+
+## Fields
+
+| Field | Type | Description |
+| ----- | ---- |------------ |
+<% for i = 1, #currentModule.fields do
+local prop = currentModule.fields[i]%>| <%= prop.name %> | <%= locate(prop.type):gsub('|', '\\|'):gsub('%[%]', '`[]`') %> | <%= prop.desc or '' %> |
+<% end %>
+<% elseif currentSection == 'modules' then %>
+<%
+   local reExports = {}
+   local hasReExports = false
+
+   local data = {}
+
+   if currentModule.fields then
+      data = currentModule.fields
+   else
+      for i = 1, #currentModule.data do
+         table.insert(data, currentModule.data[i].value)
+      end
+   end
+
+   for i = 1, #data do
+      local field = data[i]
+
+      local desc = (field.short_desc and field.short_desc .. '\n' .. field.desc) or field.desc
+
+      if desc == 're-export' then
+         -- Re-exporting another module
+         hasReExports = true
+         reExports[field.name] = getObj(field.type.name)
+
+         if currentModule.fields then
+            currentModule.fields[i] = nil
+         else
+            currentModule.data[i] = nil
+         end
+      end
+   end
+%>
+<%- hasReExports and '## Re-exports' or '' %>
+<% for mod, obj in pairs(reExports) do %>
+* <%- locate({id = 'custom', name = obj.name}, mod) %>: <%- obj.short_desc or obj.desc %>
+<% end %>
+<% end %>
+
+<% if currentSection ~= 'structures' then
+   local data = {}
+   local newProperties = {}
+   local newMethods = currentModule.methods or currentModule.functions
+
+   if currentModule.fields then
+      data = currentModule.fields
+   else
+      for i = 1, #currentModule.data do
+         table.insert(data, currentModule.data[i].value)
+      end
+   end
+
+   for i = 1, #data do
+      local field = data[i]
+
+      if field.type.id == 'callable' and field.visibility == 'public' then
+         local params = {}
+
+         for i = 1, #field.type.arg_types do
+            table.insert(params, {
+               name = field.type.arg_names and field.type.arg_names[i] or 'arg' .. i,
+               desc = '',
+               type = field.type.arg_types[i],
+               is_opt = false,
+               default_value = ''
+            })
+         end
+
+         local returns = {}
+
+         for i = 1, #field.type.return_types do
+            table.insert(returns, {
+               desc = '',
+               type = field.type.return_types[i]
+            })
+         end
+
+         table.insert(newMethods, {
+            name = field.name,
+            desc = field.desc,
+            short_desc = field.short_desc,
+            params = params,
+            returns = returns,
+            is_virtual = false,
+            is_abstract = false,
+            is_deprecated = false,
+            is_static = true
+         })
+      elseif field.visibility == 'public' then
+         table.insert(newProperties, field)
+      end
+   end
+
+   if #newProperties > 0 then %>
+## Properties
+
+| Property | Type | Description |
+| -------- | ---- |----------- |
+<% for i = 1, #newProperties do
+local prop = newProperties[i]%>| <%= prop.name %> | <%= locate(prop.type):gsub('|', '\\|') %> | <%= prop.desc %> |
+<% end %>
+<% end
+
+   if #newMethods > 0 then %>
+## <%- currentSection == 'modules' and 'Functions' or 'Methods' %>
+
+<% for i = 1, #newMethods do
+local method = newMethods[i]
+local params = ''
+
+local returns = ''
+
+for i = 1, #method.params do
+   params = params .. (params ~= '' and ', ' or '') .. method.params[i].name .. ': ' .. locate(method.params[i].type)
+end
+
+for i = 1, #method.returns do
+   returns = returns .. (returns ~= '' and ', ' or '') .. locate(method.returns[i].type)
+end%>
+### <%= currentModule.name %><%= method.is_static and '.' or ':' %><%= method.name %>(<%= params %>)<%= returns ~= '' and ': ' .. returns or '' %>
+<% if method.is_deprecated then %>
+> 🛑 This method is deprecated and should not be used
+<% end %>
+<%- method.short_desc or '' %>
+<%- method.desc or '' %>
+<% end
+end
+end %>

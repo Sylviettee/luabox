@@ -1,0 +1,29 @@
+package: luabox
+
+description:
+  summary: >
+    Small low-level terminal API library. 
+    This is a rewrite of Termion, a Rust library, for Lua.
+  license: MIT
+  homepage: https://github.com/SovietKitsune/luabox
+  labels: [tui, terminal]
+
+dependencies:
+  - luv
+
+source:
+  url: https://github.com/SovietKitsune/luabox.git
+
+build:
+  type: builtin
+  modules:
+    luabox: "luabox.lua"
+    luabox.clear: "luabox/clear.lua"
+    luabox.colors: "luabox/colors.lua"
+    luabox.console: "luabox/console.lua"
+    luabox.cursor: "luabox/cursor.lua"
+    luabox.event: "luabox/event.lua"
+    luabox.init: "luabox/init.lua"
+    luabox.screen: "luabox/screen.lua"
+    luabox.scroll: "luabox/scroll.lua"
+    luabox.util: "luabox/util.lua"

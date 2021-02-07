@@ -1,0 +1,8 @@
+/luarocks
+/lua
+/lua_modules
+/.luarocks
+/deps
+/examples/minesweeper/*.lua
+docs.json
+docs

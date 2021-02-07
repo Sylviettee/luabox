@@ -1,0 +1,26 @@
+site_name: Luabox
+site_description: Small low-level terminal API library. 
+site_author: Soviet Kitsune
+
+repo_url: https://github.com/SovietKitsune/Luabox
+repo_name: SovietKitsune/Luabox
+
+edit_uri: ""
+
+theme:
+  name: material
+  palette:
+    scheme: preference
+    primary: teal
+    accent: teal
+
+extra:
+  social:
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/uCDq5mw
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - toc:
+      permalink: true
