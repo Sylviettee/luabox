@@ -1,7 +1,8 @@
 package: luabox
 
 description:
-  summary: >
+  summary: Small low-level terminal API library. 
+  detailed: >
     Small low-level terminal API library. 
     This is a rewrite of Termion, a Rust library, for Lua.
   license: MIT
@@ -12,7 +13,7 @@ dependencies:
   - luv
 
 source:
-  url: https://github.com/SovietKitsune/luabox.git
+  url: git://github.com/SovietKitsune/luabox.git
 
 build:
   type: builtin

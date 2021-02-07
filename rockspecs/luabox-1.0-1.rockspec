@@ -17,18 +17,19 @@ dependencies = {
   "luv"
 }
 description = {
+  detailed = "Small low-level terminal API library.  This is a rewrite of Termion, a Rust library, for Lua.\n",
   homepage = "https://github.com/SovietKitsune/luabox",
   labels = {
     "tui",
     "terminal"
   },
   license = "MIT",
-  summary = "Small low-level terminal API library.  This is a rewrite of Termion, a Rust library, for Lua.\n"
+  summary = "Small low-level terminal API library."
 }
 package = "luabox"
 rockspec_format = "3.0"
 source = {
   tag = "v1.0",
-  url = "https://github.com/SovietKitsune/luabox.git"
+  url = "git://github.com/SovietKitsune/luabox.git"
 }
 version = "1.0-1"
