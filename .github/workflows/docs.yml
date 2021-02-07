@@ -32,8 +32,7 @@ jobs:
 
       - name: build docs
         run: |
-          rm ./libs/types/discordia.lua
-          luadoc ./libs > docs.json
+          luadoc .
           py-lua-doc
           mkdocs build
 
