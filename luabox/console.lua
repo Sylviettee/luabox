@@ -2,8 +2,8 @@ local csi = require('luabox.util').csi
 
 local success, uv = pcall(require, 'luv')
 
-if not uv then
-   uv, success = pcall(require, 'uv')
+if not success then
+   success, uv = pcall(require, 'uv')
 end
 
 assert(success, uv)
