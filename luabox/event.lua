@@ -304,6 +304,16 @@ function eventMod.parse(item, rest)
             key = 'esc'
          }
       end
+   elseif item == '\n' or item == '\r' then
+      return {
+         key = 'char',
+         char = '\n'
+      }
+   elseif item == '\t' then
+      return {
+         key = 'char',
+         char = '\t'
+      }
    elseif item == string.char(127) then
       return {
          key = 'backspace'

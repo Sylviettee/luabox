@@ -79,3 +79,8 @@ console.run()
 For a larger example run `./make.sh minesweeper`. This example is a (terrible) clone of minesweeper.
 
 You will need [teal](https://github.com/teal-language/tl) in-order to compile.
+
+## TODO
+
+* [ ] - Cleanup `event.lua`
+* [ ] - Write tests
