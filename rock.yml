@@ -6,14 +6,14 @@ description:
     Small low-level terminal API library. 
     This is a rewrite of Termion, a Rust library, for Lua.
   license: MIT
-  homepage: https://github.com/SovietKitsune/luabox
+  homepage: https://github.com/Sylviettee/luabox
   labels: [tui, terminal]
 
 dependencies:
   - luv
 
 source:
-  url: git://github.com/SovietKitsune/luabox.git
+  url: git://github.com/Sylviettee/luabox.git
 
 build:
   type: builtin

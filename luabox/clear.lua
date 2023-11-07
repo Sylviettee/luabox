@@ -1,4 +1,4 @@
-local csi = require('luabox/util').csi
+local csi = require('luabox.util').csi
 
 --- module Strings to clear the screen
 ---@class clear

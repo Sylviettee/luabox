@@ -6,7 +6,6 @@ Luabox is a rewrite of [Termion](https://github.com/redox-os/termion) for Lua us
 
 * Raw mode
 * TrueColor
-* ~~Panic-full error handling~~
 * Special key event support (modifiers, special keys)
 * Async I/O
 * Mouse support
@@ -62,6 +61,7 @@ console.onData = function(data)
       console:write(cursor.show)
       console:setMode(0)
       console:exitMouseMode()
+      console:close()
 
       os.exit()
    elseif keyData.key == 'char' and keyData.char == 'c' then
@@ -76,7 +76,7 @@ end
 console.run()
 ```
 
-For a larger example run `./make.sh minesweeper`. This example is a (terrible) clone of minesweeper.
+For a larger example run `tl run examples/minesweeper/main.tl`. This example is a (terrible) clone of minesweeper.
 
 You will need [teal](https://github.com/teal-language/tl) in-order to compile.
 

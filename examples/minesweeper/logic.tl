@@ -1,25 +1,23 @@
 local box = require('luabox')
 local colors = box.colors
 
-local f = string.format
-
 local record Cell
    mine: boolean
    revealed: boolean
    flagged: boolean
-   x: number
-   y: number
+   x: integer
+   y: integer
 end
 
 local record Game
-   width: number
+   width: integer
    grid: {{Cell}}
    term: luabox.Console
    gameOver: boolean
 end
 
 -- Constants
-local cellBg = '▒'
+local cellBg = '.'
 
 local bounds = {
    horizontal = '─',
@@ -30,7 +28,7 @@ local bounds = {
    bottomRightCorner = '┘'
 }
 
-local function bombsNear(current: Cell, grid: {{Cell}}): number | nil
+local function bombsNear(current: Cell, grid: {{Cell}}): integer | nil
    --[[
    [1][1][2][1][1]
    [1][*][2][*][1]
@@ -83,7 +81,7 @@ function Game.new(term: luabox.Console): Game
    return self
 end
 
-function Game:setup(difficulty: number, cells: number)
+function Game:setup(difficulty: integer, cells: integer)
    local cellsPerRow = math.sqrt(cells)
    local row = 1
    local col = 1
@@ -152,7 +150,7 @@ function Game:render(): string
    return border:match('^%s*(.-)%s*$')
 end
 
-function Game:goTo(x: number, y: number)
+function Game:goTo(x: integer, y: integer)
    if self.gameOver then
       return
    end
@@ -164,7 +162,7 @@ function Game:goTo(x: number, y: number)
    self.term:write(box.cursor.goTo(x + 1, y + 1))
 end
 
-function Game:flag(x: number, y: number)
+function Game:flag(x: integer, y: integer)
    if self.gameOver then
       return
    end
@@ -172,7 +170,7 @@ function Game:flag(x: number, y: number)
    self.grid[y][x].flagged = not self.grid[y][x].flagged
 end
 
-function Game:reveal(x: number, y: number)
+function Game:reveal(x: integer, y: integer)
    if self.gameOver then
       return
    end

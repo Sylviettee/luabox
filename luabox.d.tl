@@ -5,7 +5,7 @@ global record luabox
 
    record StringIterator
       next: function(self: StringIterator)
-      pos: number
+      pos: integer
       str: string
       original: string
    end
@@ -15,13 +15,14 @@ global record luabox
       char: string | nil
       button: buttons | nil
       event: events | nil
-      x: number | nil
-      y: number | nil
+      x: integer | nil
+      y: integer | nil
    end
 
    enum keys
       'backspace'
       'left'
+      'right'
       'up'
       'down'
       'home'
@@ -64,33 +65,33 @@ global record luabox
    end
 
    record colors
-      black: number
-      red: number
-      green: number
-      yellow: number
-      blue: number
-      magenta: number
-      cyan: number
-      white: number
+      black: integer
+      red: integer
+      green: integer
+      yellow: integer
+      blue: integer
+      magenta: integer
+      cyan: integer
+      white: integer
 
-      lightBlack: number
-      lightRed: number
-      lightGreen: number
-      lightYellow: number
-      lightBlue: number
-      lightMagenta: number
-      lightCyan: number
-      lightWhite: number
+      lightBlack: integer
+      lightRed: integer
+      lightGreen: integer
+      lightYellow: integer
+      lightBlue: integer
+      lightMagenta: integer
+      lightCyan: integer
+      lightWhite: integer
 
       resetFg: string
       resetBg: string
 
-      bg: function(code: number | truecolorOut): string
-      fg: function(code: number | truecolorOut): string
-      truecolor: function(r: number, g: number, b: number): truecolorOut
+      bg: function(code: integer | truecolorOut): string
+      fg: function(code: integer | truecolorOut): string
+      truecolor: function(r: integer, g: integer, b: integer): truecolorOut
 
       record truecolorOut
-         sec: number
+         sec: integer
          color: string
       end
    end
@@ -109,11 +110,11 @@ global record luabox
       blickingBar: string
       steadyBar: string
 
-      up: function(count: number | nil): string
-      down: function(count: number | nil): string
-      right: function(count: number | nil): string
-      left: function(count: number | nil): string
-      goTo: function(x: number, y: number): string
+      up: function(count: integer | nil): string
+      down: function(count: integer | nil): string
+      right: function(count: integer | nil): string
+      left: function(count: integer | nil): string
+      goTo: function(x: integer, y: integer): string
    end
 
    record event
@@ -121,8 +122,8 @@ global record luabox
    end
 
    record scroll
-      up: function(count: number | nil): string
-      down: function(count: number | nil): string
+      up: function(count: integer | nil): string
+      down: function(count: integer | nil): string
    end
 
    record util
@@ -137,8 +138,8 @@ global record luabox
    record Console
       new: function(stdin: tty, stdout: tty): Console
 
-      rawMode: number
-      normalMode: number
+      rawMode: integer
+      normalMode: integer
       isTTY: function(tty: tty): boolean
 
       onData: function(data: string)
@@ -147,9 +148,10 @@ global record luabox
       intoMouseMode: function(self: Console)
       exitMouseMode: function(self: Console)
       write: function(self: Console, data: string)
-      setMode: function(self: Console, mode: number)
-      cursorPosition: function(self: Console, noClose: boolean | nil): number, number
-      getDimensions: function(self: Console): number, number
+      setMode: function(self: Console, mode: integer)
+      cursorPosition: function(self: Console, noClose: boolean | nil): integer, integer
+      getDimensions: function(self: Console): integer, integer
+      close: function(self: Console)
    end
 end
 

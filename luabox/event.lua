@@ -2,7 +2,7 @@
 ---@class event
 local eventMod = {}
 
-local util = require('luabox/util')
+local util = require('luabox.util')
 local success, bit = pcall(require, 'bit')
 
 if not success then
@@ -18,8 +18,6 @@ if not success then
    end
 end
 
---; TODO; lets not let UTF8 make things not fun...
-
 local function parseCSI(item)
    local nextChar = item:next()
 
@@ -31,8 +29,6 @@ local function parseCSI(item)
             key = 'f',
             char = 1 + byte - 65
          }
-      else
-         return error('Sequence not recognized')
       end
    elseif nextChar == 'D' then
       return {
@@ -67,7 +63,7 @@ local function parseCSI(item)
       -- ESC [ CB Cx Cy
 
       if not bit then
-         return error('For X10 mouse support, Lua 5.3+ must be used or `luabitop` be installed')
+         return error('For X10 mouse support, Lua 5.3+ must be used or `luabitop` must be installed')
       end
 
       local cb = string.byte(item:next()) - 32
@@ -97,7 +93,7 @@ local function parseCSI(item)
       elseif xand == 3 then
          event = 'release'
       else
-         return error('Sequence not recognized')
+         return nil
       end
 
       return {
@@ -118,11 +114,11 @@ local function parseCSI(item)
       end
 
       local strBuffer = table.concat(buffer)
-      local nums = util.split(strBuffer, ';')
+      local numbers = util.split(strBuffer, ';')
 
-      local cb = tonumber(nums[1])
-      local x = tonumber(nums[2])
-      local y = tonumber(nums[3])
+      local cb = tonumber(numbers[1])
+      local x = tonumber(numbers[2])
+      local y = tonumber(numbers[3])
 
       local event, button
 
@@ -145,7 +141,7 @@ local function parseCSI(item)
       elseif cb == 3 then
          event = 'release'
       else
-         return error('Sequence not recognized')
+         return nil
       end
 
       return {
@@ -175,11 +171,11 @@ local function parseCSI(item)
          -- ESC [ Cb ; Cx ; Cy ; M
          local strBuffer = table.concat(buffer)
 
-         local nums = util.split(strBuffer, ';')
+         local numbers = util.split(strBuffer, ';')
 
-         local cb = tonumber(nums[1])
-         local x = tonumber(nums[2])
-         local y = tonumber(nums[3])
+         local cb = tonumber(numbers[1])
+         local x = tonumber(numbers[2])
+         local y = tonumber(numbers[3])
 
          local event, button = 'press', nil
 
@@ -196,7 +192,7 @@ local function parseCSI(item)
          elseif cb == 96 or cb == 97 then
             event = 'wheelUp'
          else
-            return error('Sequence not recognized')
+            return nil
          end
 
          return {
@@ -209,14 +205,14 @@ local function parseCSI(item)
          -- Special key codes
          local strBuffer = table.concat(buffer)
 
-         local nums = {}
+         local numbers = {}
          local split = util.split(strBuffer, ';')
 
          for i = 1, #split do
-            table.insert(nums, tonumber(split[i]))
+            table.insert(numbers, tonumber(split[i]))
          end
 
-         local num = nums[1]
+         local num = numbers[1]
 
          if num == 1 or num == 7 then
             return {
@@ -257,21 +253,15 @@ local function parseCSI(item)
                key = 'f',
                char = tostring(num - 12)
             }
-         else
-            return error('Sequence not recognized')
          end
-      else
-         return error('Sequence not recognized')
       end
-   else
-      return error('Sequence not recognized')
    end
 end
 
 --- Parse an event from a single character or if needed from a StringIterator
 ---@param item string
 ---@param rest StringIterator
----@return mouseEvent | keyboardEvent
+---@return (mouseEvent | keyboardEvent)?
 function eventMod.parse(item, rest)
    if item == '\27' then
       local nextChar = rest:next()
@@ -288,8 +278,6 @@ function eventMod.parse(item, rest)
                key = 'f',
                char = tostring(1 + byte - 80)
             }
-         else
-            return error('Failed to parse event')
          end
       elseif nextChar == '[' then
          -- CSI event

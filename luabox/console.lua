@@ -80,9 +80,9 @@ function Console:write(data)
          n = 0
       else
          if e:match('^EAGAIN') then
-         n = 0
+            n = 0
          else
-         assert(n, e)
+            assert(n, e)
          end
       end
    until n == #data
@@ -92,12 +92,12 @@ end
 
 --- Set the console into mouse mode
 function Console:intoMouseMode()
-   self:write(csi('?1000h\x1b[?1002h\x1b[?1015h\x1b[?1006h'))
+   self:write(csi('?1000h\27[?1002h\27[?1015h\27[?1006h'))
 end
 
 --- Exit mouse mode
 function Console:exitMouseMode()
-   self:write(csi('?1006l\x1b[?1015l\x1b[?1002l\x1b[?1000l'))
+   self:write(csi('?1006l\27[?1015l\27[?1002l\27[?1000l'))
 end
 
 --- Get the cursor position
@@ -112,14 +112,14 @@ function Console:cursorPosition(noClose)
    self:setMode(1)
 
    -- Request cursor location
-   self:write('\x1B[6n')
+   self:write('\27[6n')
 
    local coro = coroutine.running()
 
    local othersReading = self.stdin:is_active()
 
    self:_lock(function(packet)
-      if packet:match('\x1B%[(%d+);(%d+)R') then
+      if packet:match('\27%[(%d+);(%d+)R') then
          self:setMode(previousMode)
 
          if not othersReading and not noClose then
@@ -127,7 +127,7 @@ function Console:cursorPosition(noClose)
             self:close()
          end
 
-         local x, y = packet:match('\x1B%[(%d+);(%d+)R')
+         local x, y = packet:match('\27%[(%d+);(%d+)R')
 
          coroutine.resume(coro, tonumber(x), tonumber(y))
 
@@ -143,6 +143,12 @@ end
 ---@return number
 function Console:getDimensions()
    return self.stdout:get_winsize()
+end
+
+--- Closes the console
+function Console:close()
+   self.stdout:shutdown()
+   self.stdin:shutdown()
 end
 
 --- Alias for `uv.run`
@@ -166,7 +172,7 @@ function Console:_on(data)
          self._locked = nil
       end
    else
-      if data:match('\x1B%[(%d+);(%d+)R') then -- Ignore cursor locations
+      if data:match('\27%[(%d+);(%d+)R') then -- Ignore cursor locations
          return
       end
 

@@ -1,5 +1,5 @@
-local box: luabox = require('luabox')
-local Game = require('logic')
+local Game = require('examples.minesweeper.logic')
+local box = require('luabox')
 
 local util = box.util
 local event = box.event
@@ -21,7 +21,7 @@ console:write(f('%s%s', cursor.goTo(1, 1), clear.all))
 game:setup(difficulty, cells)
 
 console:setMode(1)
--- console:intoMouseMode()
+console:intoMouseMode()
 
 console:write(game:render())
 
@@ -49,6 +49,7 @@ console.onData = function(data: string)
       console:write(cursor.show)
       console:setMode(0)
       console:exitMouseMode()
+      console:close()
 
       os.exit()
    elseif keyData.key == 'ctrl' and keyData.char == 'r' then
@@ -62,6 +63,9 @@ console.onData = function(data: string)
       y = y - 1
    elseif keyData.key == 'down' then
       y = y + 1
+   elseif keyData.event and keyData.event == 'release' and keyData.x then
+      x = keyData.x
+      y = keyData.y
    elseif keyData.key == 'char' and keyData.char == 'f' then
       game:flag(x, y)
    elseif keyData.key == 'char' and keyData.char == 'r' then

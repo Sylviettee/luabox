@@ -1,4 +1,4 @@
-local csi = require('luabox/util').csi
+local csi = require('luabox.util').csi
 
 local function direction(dir)
    return function(x)

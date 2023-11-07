@@ -15,7 +15,8 @@
 ---@field public left fun(count: number): string Go left a certain count
 ---@field public right fun(count: number): string Go right a certain count
 ---@field public goTo fun(x: number, y: number): string Go to a specific location
-local util = require('luabox/util')
+
+local util = require('luabox.util')
 local csi = util.csi
 
 local f = string.format

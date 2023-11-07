@@ -10,5 +10,3 @@ cd examples/$1
 for file in *.tl; do
     tl gen $file
 done
-
-$lua main.lua

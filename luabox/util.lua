@@ -70,6 +70,8 @@ function util.getHandles()
       uv.pipe_open(stdout, 1)
    end
 
+   stdout:set_blocking(true)
+
    return stdin, stdout
 end
 

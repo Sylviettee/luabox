@@ -8,7 +8,7 @@ local csi = require('luabox.util').csi
 ---@field public toMain string Switch to the main screen
 local screen = {
    toAlternative = csi('?1049h'),
-   toMain = csi('?10491')
+   toMain = csi('?1049l')
 }
 
 return screen
