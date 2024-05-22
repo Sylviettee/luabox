@@ -50,8 +50,8 @@ end
 ---@field public lightWhite number
 ---@field public resetFg string
 ---@field public resetBg string
----@field public bg fun(color: number): string Get a string to change the background to the passed color
----@field public fg fun(color: number): string Get a string to change the foreground to the passed color
+---@field public bg fun(color: number | table): string Get a string to change the background to the passed color
+---@field public fg fun(color: number | table): string Get a string to change the foreground to the passed color
 ---@field public truecolor fun(r: number, g: number, b: number): table Pass to `bg` or `fg` in order to get a string
 local colors = {
    black = 0,
